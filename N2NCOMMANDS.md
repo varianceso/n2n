@@ -6,6 +6,6 @@
 
 # 例子
         服务端:
-            sudo supernode -f -v -l 8899
+            sudo supernode -f -v -l 16575
         客户端:
-            sudo edge -d n2n0 -c myn2n -k 123456789 -a 1.2.3.4 -l 192.168.1.174:8899
+            sudo edge -d edge0 -c myn2n -k qwert@54321abcdefg -a 10.10.10.1 -l 180.76.148.9:16575
