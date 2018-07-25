@@ -18,3 +18,7 @@
         GSSAPIAuthentication yes
         GSSAPIDelegateCredentials no
         HostKeyAlgorithms ssh-rsa,ssh-dss
+
+# ssh卡在debug1: SSH2_MSG_KEXINIT sent解决方法
+        原因在于MTU设置的太大导致的 -M 设置MTU值
+        sudo edge -d edge0 -c myn2n -k qwert@54321abcdefg -a 172.16.52.200 -l 180.76.148.9:6688 -M 1000
