@@ -9,3 +9,6 @@
             sudo supernode -f -v -l 16575
         客户端:
             sudo edge -d edge0 -c myn2n -k qwert@54321abcdefg -a 10.10.10.1 -l 180.76.148.9:16575
+
+## Mac系统下安装，需要将openssl目录软链接到/usr/local/include目录下
+        ln -s /usr/local/Cellar/openssl/1.0.2o_2/include/openssl /usr/local/include/ 
