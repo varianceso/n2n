@@ -19,6 +19,9 @@
 #ifndef _N2N_H_
 #define _N2N_H_
 
+//My DEBUG
+#include "auxiliary_means/mydebug.h"
+
 /*
   tunctl -t tun0
   tunctl -t tun1

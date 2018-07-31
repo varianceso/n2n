@@ -19,6 +19,10 @@
 #if !defined( N2N_WIRE_H_ )
 #define N2N_WIRE_H_
 
+//MY DEBUG
+#include "auxiliary_means/mydebug.h"
+
+
 #include <stdlib.h>
 
 #if defined(WIN32)

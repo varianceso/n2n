@@ -67,15 +67,19 @@ DOCS=edge.8.gz supernode.1.gz n2n.7.gz
 all: $(APPS) $(DOCS) benchmark
 
 edge: edge.c $(N2N_LIB) n2n_wire.h n2n.h Makefile
+	#make clean
 	$(CC) $(CFLAGS) edge.c $(N2N_LIB) $(LIBS_EDGE) -o edge
 
 test: test.c $(N2N_LIB) n2n_wire.h n2n.h Makefile
+	#make clean
 	$(CC) $(CFLAGS) test.c $(N2N_LIB) $(LIBS_EDGE) -o test
 
 supernode: sn.c $(N2N_LIB) n2n.h Makefile
+	#make clean
 	$(CC) $(CFLAGS) sn.c $(N2N_LIB) $(LIBS_SN) -o supernode
 
 benchmark: benchmark.c $(N2N_LIB) n2n_wire.h n2n.h Makefile
+	#make clean
 	$(CC) $(CFLAGS) benchmark.c $(N2N_LIB) $(LIBS_SN) -o benchmark
 
 example_edge_embed: example_edge_embed.c $(N2N_LIB) n2n.h

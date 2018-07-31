@@ -315,6 +315,8 @@ static int scan_address(char * ip_addr, size_t addr_size,
       return -1;
     }
 
+  //DEBUG("%s\n",s);
+
   memset(ip_addr, 0, addr_size);
 
   p = strpbrk(s, ":");
@@ -355,9 +357,10 @@ static void daemonize() {
   signal(SIGCHLD, SIG_IGN);
   signal(SIGQUIT, SIG_IGN);
 
-  if((childpid = fork()) < 0)
+  if((childpid = fork()) < 0) {
     traceEvent(TRACE_ERROR, "Occurred while daemonizing (errno=%d)",
-	       errno);
+	      errno);
+}
   else {
     if(!childpid) { /* child */
       int rc;
@@ -393,6 +396,9 @@ static void daemonize() {
 
 /** Entry point to program from kernel. */
 int main(int argc, char* argv[]) {
+
+  DEBUG("edge main begin ... \n");
+
   int     opt;
   int     keep_on_running = 1;
   int     local_port = 0 /* any port */;
@@ -424,10 +430,16 @@ int main(int argc, char* argv[]) {
       exit(1);
     }
 
+  DEBUG("edge_init(&eee) finished\n");
+    
   if(getenv("N2N_KEY"))
     {
       encrypt_key = strdup(getenv("N2N_KEY"));
+      DEBUG("getenv(\"N2N_KEY\") encrypt_key=%s\n",encrypt_key);  
+    } else {
+      DEBUG("getenv(\"N2N_KEY\") encrypt_key=NULL\n");  
     }
+
 
 #ifdef WIN32
   tuntap_dev_name[0] = '\0';
@@ -442,17 +454,25 @@ int main(int argc, char* argv[]) {
       exit(1);
     }
   snprintf(linebuffer, MAX_CMDLINE_BUFFER_LENGTH, "%s",argv[0]);
+  DEBUG("linebuffer=%s\n",linebuffer);
 
 #ifdef WIN32
   for(i=0; i < (int)strlen(linebuffer); i++)
     if(linebuffer[i] == '\\') linebuffer[i] = '/';
 #endif
 
+  DEBUG("argc=%d\n",argc);
   for(i=1;i<argc;++i)
     {
+      //DEBUG("argv[%d][0]=%c\n",i,argv[i][0]);
       if(argv[i][0] == '@')
         {
-	  if(readConfFile(&argv[i][1], linebuffer)<0) exit(1); /* <<<<----- check */
+	  if(readConfFile(&argv[i][1], linebuffer)<0)
+          {
+            DEBUG("readConfFile(&argv[i][1], linebuffer)<0\n");
+            exit(1); /* <<<<----- check */
+          }
+      DEBUG("argv[%d][1]=%s\n",i,argv[i][1]);
         }
       else if((strlen(linebuffer)+strlen(argv[i])+2) < MAX_CMDLINE_BUFFER_LENGTH)
         {
@@ -462,12 +482,15 @@ int main(int argc, char* argv[]) {
       else
         {
 	  traceEvent(TRACE_ERROR, "too many argument");
+      DEBUG("too many argument\n");
 	  exit(1);
         }
     }
   /*  strip trailing spaces */
   while(strlen(linebuffer) && linebuffer[strlen(linebuffer)-1]==' ')
     linebuffer[strlen(linebuffer)-1]= '\0';
+  DEBUG("-------------------------------\n");
+  DEBUG("linebuffer=%s\n",linebuffer);
 
   /* build the new argv from the linebuffer */
   effectiveargv = buildargv(&effectiveargc, linebuffer);
@@ -480,8 +503,11 @@ int main(int argc, char* argv[]) {
 
   /* {int k;for(k=0;k<effectiveargc;++k)  printf("%s\n",effectiveargv[k]);} */
 
-  if(effectiveargc < 2)
-    help();
+  if(effectiveargc < 2) {
+    //help();
+    DEBUG("effectiveargc < 2\n");
+  }
+  //DEBUG("effectiveargv=%s\n",*effectiveargv);
 
   optarg = NULL;
   while((opt = getopt_long(effectiveargc,
@@ -512,12 +538,14 @@ int main(int argc, char* argv[]) {
 	  scan_address(ip_addr, N2N_NETMASK_STR_SIZE,
 		       ip_mode, N2N_IF_MODE_SIZE,
 		       optarg);
+      DEBUG("ip_addr=%s\n",ip_addr);
 	  break;
 	}
       case 'c': /* community as a string */
 	{
 	  memset(eee.community_name, 0, N2N_COMMUNITY_SIZE);
 	  strncpy((char *)eee.community_name, optarg, N2N_COMMUNITY_SIZE);
+      DEBUG("eee.community_name=%s\n",eee.community_name);
 	  break;
 	}
       case 'E': /* multicast ethernet addresses accepted. */
@@ -550,12 +578,14 @@ int main(int argc, char* argv[]) {
       case 'm' : /* TUNTAP MAC address */
 	{
 	  strncpy(device_mac,optarg,N2N_MACNAMSIZ);
+      DEBUG("device_mac=%s\n",device_mac);
 	  break;
 	}
 
       case 'M' : /* TUNTAP MTU */
 	{
 	  mtu = atoi(optarg);
+      DEBUG("mtu=%d\n",mtu);
 	  break;
 	}
 
@@ -568,6 +598,7 @@ int main(int argc, char* argv[]) {
 	    } else {
 	    traceEvent(TRACE_DEBUG, "encrypt_key = '%s'\n", encrypt_key);
 	    encrypt_key = strdup(optarg);
+        DEBUG("encrypt_key=%s\n",encrypt_key);
 	  }
 	  break;
 	}
@@ -583,6 +614,8 @@ int main(int argc, char* argv[]) {
 	    {
 	      strncpy((eee.sn_ip_array[eee.sn_num]), optarg, N2N_EDGE_SN_HOST_SIZE);
 	      traceEvent(TRACE_DEBUG, "Adding supernode[%u] = %s\n", (unsigned int)eee.sn_num, (eee.sn_ip_array[eee.sn_num]));
+          DEBUG("Adding supernode[%u] = %s\n", (unsigned int)eee.sn_num, 
+                  (eee.sn_ip_array[eee.sn_num]));
 	      ++eee.sn_num;
 	    }
 	  else
@@ -597,6 +630,7 @@ int main(int argc, char* argv[]) {
       case 'd': /* TUNTAP name */
 	{
 	  strncpy(tuntap_dev_name, optarg, N2N_IFNAMSIZ);
+      DEBUG("tunap_dev_name=%s\n",tuntap_dev_name);
 	  break;
 	}
 #endif
@@ -610,6 +644,7 @@ int main(int argc, char* argv[]) {
       case 'p':
 	{
 	  local_port = atoi(optarg);
+      DEBUG("local_port=%d\n",local_port);
 	  break;
 	}
 
@@ -626,6 +661,7 @@ int main(int argc, char* argv[]) {
 	      traceEvent(TRACE_WARNING, "Multiple subnet masks supplied.");
 	    }
 	  strncpy(netmask, optarg, N2N_NETMASK_STR_SIZE);
+      DEBUG("netmask=%s\n",netmask);
 	  got_s = 1;
 	  break;
 	}
@@ -645,18 +681,26 @@ int main(int argc, char* argv[]) {
       } /* end switch */
   }
 
+  DEBUG("-------------------------------\n");
 
+#ifndef DEBUG_ON
 #ifndef WIN32
   if(eee.daemon) {
     useSyslog = 1; /* traceEvent output now goes to syslog. */
     daemonize();
   }
+#endif
 #endif /* #ifndef WIN32 */
 
-  traceEvent(TRACE_NORMAL, "Starting n2n edge %s %s", n2n_sw_version, n2n_sw_buildDate);
+  traceEvent(TRACE_NORMAL, "Starting n2n edge %s %s",
+          n2n_sw_version, n2n_sw_buildDate);
 
-  for (i=0; i< N2N_EDGE_NUM_SUPERNODES; ++i)
+  DEBUG("Starting n2n edge %s %s\n",n2n_sw_version, n2n_sw_buildDate);
+
+  for (i=0; i< N2N_EDGE_NUM_SUPERNODES; ++i) {
     traceEvent(TRACE_NORMAL, "supernode %u => %s\n", i, (eee.sn_ip_array[i]));
+    DEBUG("supernode %u => %s\n", i, (eee.sn_ip_array[i]));
+  }
 
   supernode2addr(&(eee.supernode), eee.sn_ip_array[eee.sn_idx]);
 
@@ -695,10 +739,12 @@ int main(int argc, char* argv[]) {
     
     eee.dyn_ip_mode = 1;
   } else
-    traceEvent(TRACE_NORMAL, "ip_mode='%s'", ip_mode);    
+    traceEvent(TRACE_NORMAL, "ip_mode='%s'", ip_mode);
 
-  if(tuntap_open(&(eee.device), tuntap_dev_name, ip_mode, ip_addr, netmask, device_mac, mtu) < 0)
+  if(tuntap_open(&(eee.device), tuntap_dev_name, ip_mode, ip_addr, netmask, device_mac, mtu) < 0) {
+    DEBUG("tuntap open failed\n");
     return(-1);
+  }
 
 #ifndef WIN32
   if((userid != 0) || (groupid != 0)) {
@@ -738,10 +784,13 @@ int main(int argc, char* argv[]) {
   if(eee.udp_mgmt_sock < 0) {
     traceEvent(TRACE_ERROR, "Failed to bind management UDP port %u",
 	       (unsigned int)N2N_EDGE_MGMT_PORT);
+    DEBUG("Failed to bind management UDP port %u\n", 
+            (unsigned int)N2N_EDGE_MGMT_PORT);
     return(-1);
   }
   
   traceEvent(TRACE_NORMAL, "edge started");
+  DEBUG("edge started ...\n");
 
   update_supernode_reg(&eee, time(NULL));
 

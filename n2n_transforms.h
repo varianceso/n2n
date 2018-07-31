@@ -19,6 +19,10 @@
 #if !defined(N2N_TRANSFORMS_H_)
 #define N2N_TRANSFORMS_H_
 
+//MY DEBUG
+#include "auxiliary_means/mydebug.h"
+
+
 #include "n2n_keyfile.h"
 #include "n2n_wire.h"
 

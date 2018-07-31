@@ -74,6 +74,8 @@
 #if !defined( N2N_KEYFILE_H_ )
 #define N2N_KEYFILE_H_
 
+//MY DEBUG
+#include "auxiliary_means/mydebug.h"
 
 #include "n2n_wire.h"
 #include <time.h>

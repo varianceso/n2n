@@ -35,6 +35,10 @@
 #ifndef __TWOFISH_LIBRARY_HEADER__
 #define __TWOFISH_LIBRARY_HEADER__
 
+//MY DEBUG
+#include "auxiliary_means/mydebug.h"
+
+
 #ifndef FALSE
 #define FALSE	0
 #endif

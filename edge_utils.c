@@ -1416,6 +1416,9 @@ static void readFromIPSocket(n2n_edge_t * eee) {
 /* ************************************** */
 
 int run_edge_loop(n2n_edge_t * eee, int *keep_running) {
+
+  DEBUG("---------------------------\nrun edge loop ...\n");
+
   size_t numPurged;
   time_t lastIfaceCheck=0;
   time_t lastTransop=0;

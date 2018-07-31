@@ -74,6 +74,7 @@ int traceLevel = 2 /* NORMAL */;
 int useSyslog = 0, syslog_opened = 0;
 
 #define N2N_TRACE_DATESIZE 32
+#ifndef DEBUG_ON
 void traceEvent(int eventTraceLevel, char* file, int line, char * format, ...) {
   va_list va_ap;
 
@@ -155,6 +156,12 @@ void traceEvent(int eventTraceLevel, char* file, int line, char * format, ...) {
   }
 
 }
+#else
+
+void traceEvent(int eventTraceLevel, char* file, int line, char * format, ...) {
+    do{}while(0);
+}
+#endif
 
 /* *********************************************** */
 

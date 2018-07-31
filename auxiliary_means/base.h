@@ -27,9 +27,10 @@
 #include <sys/shm.h>
 
 static char* getnowtime(char* current, int len) {
-    if(len <= 0) {
+    if(current == NULL || len <= 0) {
         return NULL;
     }
+
     memset(current,len,0x00);
     struct timespec time;
     clock_gettime(CLOCK_REALTIME, &time);

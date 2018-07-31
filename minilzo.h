@@ -47,6 +47,10 @@
 #ifndef __MINILZO_H
 #define __MINILZO_H
 
+//MY DEBUG
+#include "auxiliary_means/mydebug.h"
+
+
 #define MINILZO_VERSION         0x2030
 
 #ifdef __LZOCONF_H
